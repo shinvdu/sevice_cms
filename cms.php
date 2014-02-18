@@ -1,35 +1,83 @@
 <?php
+
+$options = array(
+    'endpoint' =>  'http://product.sky-city.me',
+    'username' => '',
+    'password' => '',
+);
 class Cms{
-    private $endpoint = 'http://product.sky-city.me';
-    private $method = 'user.login';
-    private $methods_class = 'Cms_Methods';
-    private $user = array();
-    private $connected = false;
-    private $cookieFile;
+    private $_methods_class = 'Cms_Methods';
+    private $_methods;
+    private $_options = array();
+    private $_connected = false;
+    private $_cookieFile;
+
+// data stored in this object
     private $node;
-    function __construct($user){
-        $this->user['username'] = $user['username'];
-        $this->user['password'] = $user['password'];
+
+    function __construct($options){
+        $this->_options['username'] = $options['username'];
+        $this->_options['password'] = $options['password'];
+        $this->_cookieFile = tempnam('/tmp', 'CURLCOOKIE');
+        $this->_methods = new $this->_methods_class();
     }
-    function connect(){
-        if($this->connected || $this->login()){
-            $this->connected = true;
+    private function connect(){
+        if($this->_connected || $this->login()){
+            $this->_connected = true;
         }else{
             exit('error, can not connect');
         }
-        return $this->connected;
+        return $this->_connected;
+    }
+    public function connected(){
+        return $this->_connected;
     }
 
+    private function requestSend( $methodName, $args = array()){
+        // Setup curl
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_COOKIEJAR, $this->_cookieFile);
+        curl_setopt($ch, CURLOPT_COOKIEFILE, $this->_cookieFile);
+        curl_setopt($ch, CURLOPT_URL, $this->_options['endpoint']);
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'Content-Type: text/xml; charset=utf-8' ));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, xmlrpc_encode_request($methodName, $args));
+        $output = curl_exec($ch);
+        $info 	= curl_getinfo($ch);
+        curl_close($ch);
+
+        $response = xmlrpc_decode($output, 'utf-8');
+
+        if (!is_array($response)) {
+            exit(print_r($info, true));
+        } elseif (xmlrpc_is_fault($response)) {
+            var_dump($response);
+            $response = false;
+        } 
+        return $response;
+    }
     function login(){
-        $login = new Cms_Methods();
-        return $login->__get('CONNECT');
+        try {
+            $result = $this->requestSend($this->_methods->CONNECT);
+            $result = $this->requestSend($this->_methods->LOGIN, array(
+                $this->_options['username'],
+                $this->_options['password'],
+            ));
+            $this->_connected = is_array($result);
+        } catch (Exception $e) {
+            echo $this->_methods->CONNECT . ":" . $e->getMessage();
+        }
+        return $this->_connected;
     }
     function logout(){
 
     }
-    function node_load(){
+    public function node_load($nid, $fields = array()) {
         $this->connect();
-
+        return $this->requestSend($this->_methods->NODE_GET, array($nid));
     }
     function node_list(){
         $this->connect();
