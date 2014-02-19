@@ -1,10 +1,5 @@
 <?php
 
-$options = array(
-    'endpoint' =>  'http://product.sky-city.me',
-    'username' => '',
-    'password' => '',
-);
 class Cms{
     private $_methods_class = 'Cms_Methods';
     private $_methods;
@@ -18,6 +13,8 @@ class Cms{
     function __construct($options){
         $this->_options['username'] = $options['username'];
         $this->_options['password'] = $options['password'];
+        $this->_options['endpoint'] = $options['endpoint'];
+        $this->_options['token'] = file_get_contents('http://product.sky-city.me/services/session/token');
         $this->_cookieFile = tempnam('/tmp', 'CURLCOOKIE');
         $this->_methods = new $this->_methods_class();
     }
@@ -33,7 +30,7 @@ class Cms{
         return $this->_connected;
     }
 
-    private function requestSend( $methodName, $args = array()){
+    private function requestSend($methodName, $args = array()){
         // Setup curl
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_COOKIEJAR, $this->_cookieFile);
@@ -72,31 +69,52 @@ class Cms{
         }
         return $this->_connected;
     }
-    function logout(){
+    public function logout(){
 
     }
-    public function node_load($nid, $fields = array()) {
+    public function node_load($nid) {
+        return (object)$this->requestSend($this->_methods->NODE_GET, array($nid));
+    }
+    public function node_list(){
         $this->connect();
+
+    }
+    public function term_list(){
+        $this->connect();
+
+    }
+    public function term_load(){
         return $this->requestSend($this->_methods->NODE_GET, array($nid));
     }
-    function node_list(){
-        $this->connect();
-
+    public function test(){
+//        return $this->requestSend($this->_methods->NODE_GET, array('aa' => 34, 'bb' => 56));
+          $result = $this->requestSend($this->_methods->CONNECT);
+          if ($result) {
+              echo 'yes'.print_r($result);
+          }else {
+              echo 'no';
+          }
     }
-    function term_list(){
-        $this->connect();
-
+    public function test2($nid){
+//        return $this->requestSend($this->_methods->NODE_GET, array($nid));
+//          $result = $this->requestSend($this->_methods->CONNECT);
+          /*
+          $result = $this->requestSend($this->_methods->LOGIN, array(
+                $this->_options['username'],
+                $this->_options['password'],
+                $this->_options['token'],
+            ));
+           */
+        return $this->requestSend($this->_methods->NODE_GET, array($nid));
     }
-    function term_load(){
-        $this->connect();
 
-    }
 }
 class Cms_Methods{
     const CONNECT 	= 'system.connect';
     const LOGIN		= 'user.login';
     const LOGOUT	= 'user.logout';
     const SERVICES_GET = 'system.getServices';
+    const USER_LOAD	= 'user.retrieve';
 
     // ref: http://cms.woger-cdn.com/admin/build/services/browse/node.get
     const NODE_GET	= 'node.retrieve';
@@ -115,11 +133,16 @@ class Cms_Methods{
     }
 }
 
-$user = array(
-        'username' => 'tian',
-        'password' => 'bo',
-        );
-$cms = new Cms($user);
+$options = array(
+    'endpoint' =>  'http://product.sky-city.me/?q=service/output',
+//    'endpoint' =>  'http://product.sky-city.me/test.php',
+    'username' => 'product',
+    'password' => 'product&sky-city',
+);
+$cms = new Cms($options);
 //print_r($cms->connect());
-echo $cms->login();
+//echo $cms->requestSend($this->_methods->NODE_GET, array('aa' => 34, 'bb' => 56));
+//$cms->test();
+print_r($cms->node_load(1));
+//print_r($cms->user_load(1));
 ?>
