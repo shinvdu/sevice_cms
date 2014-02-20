@@ -30,22 +30,33 @@ class Cms{
         return $this->_connected;
     }
 
-    private function requestSend($methodName, $args = array()){
+    private function requestSend($methodName, $args = array(), $token = false){
         // Setup curl
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_COOKIEJAR, $this->_cookieFile);
         curl_setopt($ch, CURLOPT_COOKIEFILE, $this->_cookieFile);
         curl_setopt($ch, CURLOPT_URL, $this->_options['endpoint']);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        curl_setopt($ch, CURLINFO_HEADER_OUT, true); // enable tracking
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
 
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'Content-Type: text/xml; charset=utf-8' ));
-        curl_setopt($ch, CURLOPT_POSTFIELDS, xmlrpc_encode_request($methodName, $args));
+        $csrf_header = 'X-CSRF-Token: ' . $this->_options['token'];
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: text/xml; charset=utf-8', $csrf_header));
+        if(!$token){
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, xmlrpc_encode_request($methodName, $args));
+        }
         $output = curl_exec($ch);
         $info 	= curl_getinfo($ch);
+        $headerSent = curl_getinfo($ch, CURLINFO_HEADER_OUT);
+        echo $headerSent;
+//        print_r($info);
         curl_close($ch);
-
+        if($token){
+            return $output;
+        }
         $response = xmlrpc_decode($output, 'utf-8');
 
         if (!is_array($response)) {
@@ -59,10 +70,17 @@ class Cms{
     function login(){
         try {
             $result = $this->requestSend($this->_methods->CONNECT);
+            print_r($result);
             $result = $this->requestSend($this->_methods->LOGIN, array(
                 $this->_options['username'],
                 $this->_options['password'],
             ));
+            $endpoint = $this->_options['endpoint'];
+            $this->_options['endpoint'] = 'http://product.sky-city.me/services/session/token';
+            $this->_options['token'] = $this->requestSend('', array(),true);
+            $this->_options['endpoint'] = $endpoint;
+
+            print_r($result);
             $this->_connected = is_array($result);
         } catch (Exception $e) {
             echo $this->_methods->CONNECT . ":" . $e->getMessage();
@@ -75,6 +93,14 @@ class Cms{
     public function node_load($nid) {
         return (object)$this->requestSend($this->_methods->NODE_GET, array($nid));
     }
+    public function node_save($nid, $node) {
+        $this->connect();
+        if(is_object($node)){
+            $node = (array)$node;
+        }
+        return $this->requestSend($this->_methods->NODE_SAVE, array($nid, $node));
+    }
+    
     public function node_list(){
         $this->connect();
 
@@ -96,17 +122,19 @@ class Cms{
           }
     }
     public function test2($nid){
-//        return $this->requestSend($this->_methods->NODE_GET, array($nid));
-//          $result = $this->requestSend($this->_methods->CONNECT);
-          /*
+          $result = $this->requestSend($this->_methods->CONNECT);
           $result = $this->requestSend($this->_methods->LOGIN, array(
                 $this->_options['username'],
                 $this->_options['password'],
-                $this->_options['token'],
             ));
-           */
-        return $this->requestSend($this->_methods->NODE_GET, array($nid));
+          exit(print_r($result));
+        return $this->requestSend($this->_methods->USER_LOAD, array($nid));
     }
+    public function test3(){
+        $this->_options['endpoint'] = 'http://product.sky-city.me/services/session/token';
+        return $this->_options['token'] = $this->requestSend('', array(),true);
+    }
+    
 
 }
 class Cms_Methods{
@@ -115,14 +143,8 @@ class Cms_Methods{
     const LOGOUT	= 'user.logout';
     const SERVICES_GET = 'system.getServices';
     const USER_LOAD	= 'user.retrieve';
-
-    // ref: http://cms.woger-cdn.com/admin/build/services/browse/node.get
     const NODE_GET	= 'node.retrieve';
-
-    // ref: http://cms.woger-cdn.com/admin/build/services/browse/node.update
     const NODE_SAVE = 'node.update';
-
-    // ref: http://cms.woger-cdn.com/admin/build/services/browse/search.nodes
     const SEARCH_NODES = 'search.nodes';
 
     public function __get($name){
@@ -143,6 +165,11 @@ $cms = new Cms($options);
 //print_r($cms->connect());
 //echo $cms->requestSend($this->_methods->NODE_GET, array('aa' => 34, 'bb' => 56));
 //$cms->test();
-print_r($cms->node_load(1));
-//print_r($cms->user_load(1));
+//print_r($cms->test2(1));
+$node = $cms->node_load(1);
+$node->field_filed_test['und'][0]['value'] = 'bbbb';
+print_r($cms->node_save(1,$node));
+//echo $cms->test3();
+//print_r($node);
+//$node->
 ?>
