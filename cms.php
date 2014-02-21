@@ -45,13 +45,21 @@ class Cms{
         $csrf_header = 'X-CSRF-Token: ' . $this->_options['token'];
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: text/xml; charset=utf-8', $csrf_header));
         if(!$token){
+            // for utf-8, 
+            $output_options = array( 
+                "output_type" => "xml", 
+                "verbosity" => "pretty", 
+                "escaping" => array("markup"), 
+                "version" => "xmlrpc", 
+                "encoding" => "utf-8" 
+            );
             curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, xmlrpc_encode_request($methodName, $args));
+            curl_setopt($ch, CURLOPT_POSTFIELDS, xmlrpc_encode_request($methodName, $args, $output_options));
         }
         $output = curl_exec($ch);
         $info 	= curl_getinfo($ch);
         $headerSent = curl_getinfo($ch, CURLINFO_HEADER_OUT);
-        echo $headerSent;
+//        echo $headerSent;
 //        print_r($info);
         curl_close($ch);
         if($token){
@@ -70,7 +78,7 @@ class Cms{
     function login(){
         try {
             $result = $this->requestSend($this->_methods->CONNECT);
-            print_r($result);
+       //     print_r($result);
             $result = $this->requestSend($this->_methods->LOGIN, array(
                 $this->_options['username'],
                 $this->_options['password'],
@@ -80,7 +88,7 @@ class Cms{
             $this->_options['token'] = $this->requestSend('', array(),true);
             $this->_options['endpoint'] = $endpoint;
 
-            print_r($result);
+      //      print_r($result);
             $this->_connected = is_array($result);
         } catch (Exception $e) {
             echo $this->_methods->CONNECT . ":" . $e->getMessage();
@@ -157,19 +165,19 @@ class Cms_Methods{
 
 $options = array(
     'endpoint' =>  'http://product.sky-city.me/?q=service/output',
-//    'endpoint' =>  'http://product.sky-city.me/test.php',
     'username' => 'product',
     'password' => 'product&sky-city',
 );
 $cms = new Cms($options);
-//print_r($cms->connect());
-//echo $cms->requestSend($this->_methods->NODE_GET, array('aa' => 34, 'bb' => 56));
-//$cms->test();
-//print_r($cms->test2(1));
 $node = $cms->node_load(1);
-$node->field_filed_test['und'][0]['value'] = 'bbbb';
+$output_options = array( 
+    "output_type" => "xml", 
+    "verbosity" => "pretty", 
+    "escaping" => array("markup"), 
+    "version" => "xmlrpc", 
+    "encoding" => "utf-8" 
+);
+//exit(xmlrpc_encode_request('node.save',$node, $output_options));
+$node->field_filed_test['und'][0]['value'] = 'aaaa';
 print_r($cms->node_save(1,$node));
-//echo $cms->test3();
-//print_r($node);
-//$node->
 ?>
