@@ -14,7 +14,8 @@ class Cms{
         $this->_options['username'] = $options['username'];
         $this->_options['password'] = $options['password'];
         $this->_options['endpoint'] = $options['endpoint'];
-        $this->_options['token'] = file_get_contents('http://product.sky-city.me/services/session/token');
+        $this->_options['token_url'] = $options['token_url'];
+        $this->_options['token'] = file_get_contents($options['token_url']);
         $this->_cookieFile = tempnam('/tmp', 'CURLCOOKIE');
         $this->_methods = new $this->_methods_class();
     }
@@ -84,7 +85,7 @@ class Cms{
                 $this->_options['password'],
             ));
             $endpoint = $this->_options['endpoint'];
-            $this->_options['endpoint'] = 'http://product.sky-city.me/services/session/token';
+            $this->_options['endpoint'] = $this->_options['token_url'];
             $this->_options['token'] = $this->requestSend('', array(),true);
             $this->_options['endpoint'] = $endpoint;
 
@@ -164,20 +165,12 @@ class Cms_Methods{
 }
 
 $options = array(
-    'endpoint' =>  'http://product.sky-city.me/?q=service/output',
-    'username' => 'product',
-    'password' => 'product&sky-city',
+    'endpoint' =>  'http://blog.sky-city.me/?q=service/output',
+    'token_url' =>  'http://blog.sky-city.me/services/session/token',
+    'username' => 'xxxxxxxxxx', // user added in cms, and grant the permissions
+    'password' => 'xxxxxxx',
 );
 $cms = new Cms($options);
-$node = $cms->node_load(1);
-$output_options = array( 
-    "output_type" => "xml", 
-    "verbosity" => "pretty", 
-    "escaping" => array("markup"), 
-    "version" => "xmlrpc", 
-    "encoding" => "utf-8" 
-);
-//exit(xmlrpc_encode_request('node.save',$node, $output_options));
-$node->field_filed_test['und'][0]['value'] = 'aaaa';
-print_r($cms->node_save(1,$node));
+$node = $cms->node_load(10);
+print_r($node);
 ?>
