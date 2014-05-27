@@ -4,6 +4,9 @@ class Service{
     protected $_methods_class = 'Methods';
     protected $_methods;
     protected $_token; 
+    protected $_ch; 
+    protected $_ch_info; 
+    protected $_post_fields; 
     protected $_options = array();
     protected $_connected = false;
     protected $_cookieFile;
@@ -26,65 +29,60 @@ class Service{
         return $this->_connected;
     }
 
-    protected function requestSend($methodName, $args = array(), $token = false){
+    protected function curl($url){
         // Setup curl
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_COOKIEJAR, $this->_cookieFile);
-        curl_setopt($ch, CURLOPT_COOKIEFILE, $this->_cookieFile);
-        curl_setopt($ch, CURLOPT_URL, $this->_options['endpoint']);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $this->_ch = curl_init($url);
+        curl_setopt($this->_ch, CURLOPT_COOKIEJAR, $this->_cookieFile);
+        curl_setopt($this->_ch, CURLOPT_COOKIEFILE, $this->_cookieFile);
+        curl_setopt($this->_ch, CURLOPT_RETURNTRANSFER, true);
 
-        curl_setopt($ch, CURLINFO_HEADER_OUT, true); // enable tracking
-
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($this->_ch, CURLINFO_HEADER_OUT, true); // enable tracking
 
         $csrf_header = 'X-CSRF-Token: ' . $this->_token;
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: text/xml; charset=utf-8', $csrf_header));
-        if(!$token){
-            // for utf-8, 
-            $output_options = array( 
-                "output_type" => "xml", 
-                "verbosity" => "pretty", 
-                "escaping" => array("markup"), 
-                "version" => "xmlrpc", 
-                "encoding" => "utf-8" 
+        curl_setopt($this->_ch, CURLOPT_HTTPHEADER, array('Content-Type: text/xml; charset=utf-8', $csrf_header));
+        if(!empty($this->_post_fields)){
+            curl_setopt($this->_ch, CURLOPT_POST, true);
+            curl_setopt($this->_ch, CURLOPT_POSTFIELDS, $this->_post_fields);
+        }
+        $output = curl_exec($this->_ch);
+        $this->_ch_info   = curl_getinfo($this->_ch);
+        curl_close($this->_ch);
+        return $output;
+    }
+
+    protected function requestSend($methodName, $args = array()){
+        $output_options = array( 
+            "output_type" => "xml", 
+            "verbosity" => "pretty", 
+            "escaping" => array("markup"), 
+            "version" => "xmlrpc", 
+            "encoding" => "utf-8" 
             );
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, xmlrpc_encode_request($methodName, $args, $output_options));
-        }
-        $output = curl_exec($ch);
-        $info 	= curl_getinfo($ch);
-        $headerSent = curl_getinfo($ch, CURLINFO_HEADER_OUT);
-//        echo $headerSent;
-//        print_r($info);
-        curl_close($ch);
-        if($token){
-            return $output;
-        }
+
+        $this->_post_fields = xmlrpc_encode_request($methodName, $args, $output_options);
+        // $headerSent = curl_getinfo($ch, CURLINFO_HEADER_OUT);
+        $output = $this->curl($this->_options['endpoint']);
         $response = xmlrpc_decode($output, 'utf-8');
 
         if (!is_array($response)) {
-            exit(print_r($info, true));
+            exit(print_r($this->_ch_info, true));
         } elseif (xmlrpc_is_fault($response)) {
             var_dump($response);
             $response = false;
         } 
         return $response;
     }
+
     function login(){
         try {
             $result = $this->requestSend($this->_methods->CONNECT);
-       //     print_r($result);
             $result = $this->requestSend($this->_methods->LOGIN, array(
                 $this->_options['username'],
                 $this->_options['password'],
             ));
-            $endpoint = $this->_options['endpoint'];
-            $this->_options['endpoint'] = $this->_options['token_url'];
-            $this->_token = $this->requestSend('', array(),true);
-            $this->_options['endpoint'] = $endpoint;
+            // upate token
+            $this->_token = $this->curl($this->_options['token_url']);
 
-      //      print_r($result);
             $this->_connected = is_array($result);
         } catch (Exception $e) {
             echo $this->_methods->CONNECT . ":" . $e->getMessage();
