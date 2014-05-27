@@ -1,0 +1,7 @@
+<?php
+$options = array(
+    'endpoint' =>  'http://domain/xxxx/xxxxx',
+    'token_url' =>  'http://blog.sky-city.me/services/session/token',
+    'username' => 'user_in_drupal', // user added in cms, and grant the permissions
+    'password' => 'password',
+);

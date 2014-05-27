@@ -1,7 +1,8 @@
 <?php
+require 'Methods.php';
 
-class Cms{
-    private $_methods_class = 'Cms_Methods';
+class Service{
+    private $_methods_class = 'Methods';
     private $_methods;
     private $_options = array();
     private $_connected = false;
@@ -96,81 +97,7 @@ class Cms{
         }
         return $this->_connected;
     }
+    
     public function logout(){
-
-    }
-    public function node_load($nid) {
-        return (object)$this->requestSend($this->_methods->NODE_GET, array($nid));
-    }
-    public function node_save($nid, $node) {
-        $this->connect();
-        if(is_object($node)){
-            $node = (array)$node;
-        }
-        return $this->requestSend($this->_methods->NODE_SAVE, array($nid, $node));
-    }
-    
-    public function node_list(){
-        $this->connect();
-
-    }
-    public function term_list(){
-        $this->connect();
-
-    }
-    public function term_load(){
-        return $this->requestSend($this->_methods->NODE_GET, array($nid));
-    }
-    public function test(){
-//        return $this->requestSend($this->_methods->NODE_GET, array('aa' => 34, 'bb' => 56));
-          $result = $this->requestSend($this->_methods->CONNECT);
-          if ($result) {
-              echo 'yes'.print_r($result);
-          }else {
-              echo 'no';
-          }
-    }
-    public function test2($nid){
-          $result = $this->requestSend($this->_methods->CONNECT);
-          $result = $this->requestSend($this->_methods->LOGIN, array(
-                $this->_options['username'],
-                $this->_options['password'],
-            ));
-          exit(print_r($result));
-        return $this->requestSend($this->_methods->USER_LOAD, array($nid));
-    }
-    public function test3(){
-        $this->_options['endpoint'] = 'http://product.sky-city.me/services/session/token';
-        return $this->_options['token'] = $this->requestSend('', array(),true);
-    }
-    
-
-}
-class Cms_Methods{
-    const CONNECT 	= 'system.connect';
-    const LOGIN		= 'user.login';
-    const LOGOUT	= 'user.logout';
-    const SERVICES_GET = 'system.getServices';
-    const USER_LOAD	= 'user.retrieve';
-    const NODE_GET	= 'node.retrieve';
-    const NODE_SAVE = 'node.update';
-    const SEARCH_NODES = 'search.nodes';
-
-    public function __get($name){
-        if (!constant($constant = get_class($this) . '::' . $name)) {
-            throw new Exception('Invalid ' . get_class($this) . ' const');
-        }
-        return constant($constant);
     }
 }
-
-$options = array(
-    'endpoint' =>  'http://blog.sky-city.me/?q=service/output',
-    'token_url' =>  'http://blog.sky-city.me/services/session/token',
-    'username' => 'xxxxxxxxxx', // user added in cms, and grant the permissions
-    'password' => 'xxxxxxx',
-);
-$cms = new Cms($options);
-$node = $cms->node_load(10);
-print_r($node);
-?>
