@@ -3,16 +3,14 @@
 class Service{
     protected $_methods_class = 'Methods';
     protected $_methods;
+    protected $_token; 
     protected $_options = array();
     protected $_connected = false;
     protected $_cookieFile;
 
     public function __construct($options){
-        $this->_options['username'] = $options['username'];
-        $this->_options['password'] = $options['password'];
-        $this->_options['endpoint'] = $options['endpoint'];
-        $this->_options['token_url'] = $options['token_url'];
-        $this->_options['token'] = file_get_contents($options['token_url']);
+        $this->_options = $options;
+        $this->_token = file_get_contents($options['token_url']);
         $this->_cookieFile = tempnam('/tmp', 'CURLCOOKIE');
         $this->_methods = new $this->_methods_class();
     }
@@ -40,7 +38,7 @@ class Service{
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-        $csrf_header = 'X-CSRF-Token: ' . $this->_options['token'];
+        $csrf_header = 'X-CSRF-Token: ' . $this->_token;
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: text/xml; charset=utf-8', $csrf_header));
         if(!$token){
             // for utf-8, 
@@ -83,7 +81,7 @@ class Service{
             ));
             $endpoint = $this->_options['endpoint'];
             $this->_options['endpoint'] = $this->_options['token_url'];
-            $this->_options['token'] = $this->requestSend('', array(),true);
+            $this->_token = $this->requestSend('', array(),true);
             $this->_options['endpoint'] = $endpoint;
 
       //      print_r($result);
