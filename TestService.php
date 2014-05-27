@@ -1,6 +1,6 @@
 <?php
 
-class Test extends Service
+class TestService extends Service
 {
     public function test(){
 //        return $this->requestSend($this->_methods->NODE_GET, array('aa' => 34, 'bb' => 56));
@@ -21,7 +21,7 @@ class Test extends Service
         return $this->requestSend($this->_methods->USER_LOAD, array($nid));
     }
     public function test3(){
-        $this->_options['endpoint'] = 'http://product.sky-city.me/services/session/token';
+        $this->_options['endpoint'] = 'http://ted.sky-city.me/services/session/token';
         return $this->_options['token'] = $this->requestSend('', array(),true);
     }
     

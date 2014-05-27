@@ -1,17 +1,13 @@
 <?php
-require 'Methods.php';
 
 class Service{
-    private $_methods_class = 'Methods';
-    private $_methods;
-    private $_options = array();
-    private $_connected = false;
-    private $_cookieFile;
+    protected $_methods_class = 'Methods';
+    protected $_methods;
+    protected $_options = array();
+    protected $_connected = false;
+    protected $_cookieFile;
 
-// data stored in this object
-    private $node;
-
-    function __construct($options){
+    public function __construct($options){
         $this->_options['username'] = $options['username'];
         $this->_options['password'] = $options['password'];
         $this->_options['endpoint'] = $options['endpoint'];
@@ -20,7 +16,7 @@ class Service{
         $this->_cookieFile = tempnam('/tmp', 'CURLCOOKIE');
         $this->_methods = new $this->_methods_class();
     }
-    private function connect(){
+    protected function connect(){
         if($this->_connected || $this->login()){
             $this->_connected = true;
         }else{
@@ -32,7 +28,7 @@ class Service{
         return $this->_connected;
     }
 
-    private function requestSend($methodName, $args = array(), $token = false){
+    protected function requestSend($methodName, $args = array(), $token = false){
         // Setup curl
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_COOKIEJAR, $this->_cookieFile);
@@ -97,7 +93,7 @@ class Service{
         }
         return $this->_connected;
     }
-    
+
     public function logout(){
     }
 }

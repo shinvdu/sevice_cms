@@ -1,8 +1,10 @@
 <?php
 require 'settings.php';
-require 'service.php';
+require 'Methods.php';
+require 'Service.php';
+require 'Node.php';
 
-$cms = new Service($options);
+$cms = new Node($options);
 $node = $cms->node_load(1);
 print_r($node);
 ?>
