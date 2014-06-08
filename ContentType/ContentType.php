@@ -3,8 +3,9 @@ abtract class ContentType
 {
 	protected $node = array();
 
-	__contruct($csv)
+	__contruct($yaml, $csv)
 	{
+		$this->loadFields($yaml);
 		$this->fromCsv($csv);
 	}
 
@@ -18,9 +19,22 @@ abtract class ContentType
 		$this->node[$key] = $value;
 	}
 
+	public function loadFields($yaml)
+	{
+		$fields = yaml_parse_file($yaml);
+
+		foreach ($fields as $field) {
+			$this->node[$field] = NULL;
+		}
+	}
+
 	public function fromCsv($node)
 	{
-		# code...
+		foreach ($node as $field) {
+			foreach ($this->node as $key  => $value) {
+				$this->node[$key] = $field;
+			}
+		}
 	}
 	public function toCsv($node)
 	{
