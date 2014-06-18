@@ -1,22 +1,27 @@
 <?php
-abtract class ContentType
+abstract class ContentType
 {
 	protected $node = array();
-
-	__contruct($yaml, $csv)
-	{
+	
+	function __construct($yaml, $csv){
 		$this->loadFields($yaml);
 		$this->fromCsv($csv);
 	}
 
 	public function __get($key)
 	{
-		return $this->node[$key];
+		if (array_key_exists($key, $this->node)) {
+			return $this->node[$key];
+		} else {
+			return null;
+		}
 	}
 
 	public function __set($key, $value)
 	{
-		$this->node[$key] = $value;
+		if (array_key_exists($key, $this->node)) {
+		    $this->node[$key] = $value;
+		 }
 	}
 
 	public function loadFields($yaml)
