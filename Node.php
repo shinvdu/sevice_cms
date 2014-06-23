@@ -35,8 +35,14 @@ class Node extends Service
     }
     return $return;
   }
-  
-  public function node_list(){
-      return $this->requestSend($this->_methods->NODE_LIST);
+  /*
+    $page: The zero-based index of the page to get, defaults to 0.
+    $fields: string, The fields to get.
+    $parameters: array, Parameters array
+    $pagesize: Number of records to get per page.
+  */
+  public function node_list($page = 0, $fields = '*', $parameters = array(), $pagesize = 20){
+
+      return $this->requestSend($this->_methods->NODE_LIST, array($page, $fields, $parameters, $pagesize));
   }
 }
