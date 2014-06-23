@@ -13,11 +13,13 @@ class Methods{
     const USER_LOAD = 'user.retrieve';
     const USER_UPDATE = 'user.update';
     const USER_DELETE = 'user.delete';
+    const USER_LIST = 'user.index';
 
     const NODE_CREATE = 'node.create';
     const NODE_GET	= 'node.retrieve';
     const NODE_SAVE = 'node.update';
     const NODE_DELETE = 'node.delete';
+    const NODE_LIST = 'node.index';
 
     const COMMENT_CREATE = 'comment.create';
     const COMMENT_GET  = 'comment.retrieve';

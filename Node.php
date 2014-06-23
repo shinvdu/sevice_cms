@@ -16,8 +16,10 @@ class Node extends Service
     }
     return $this->requestSend($this->_methods->NODE_SAVE, array($nid, $node));
   }
+
   
   public function node_list(){
     $this->connect();
+      return $this->requestSend($this->_methods->NODE_LIST);
   }
 }
