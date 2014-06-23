@@ -29,6 +29,7 @@ class Methods{
     const FILE_CREATE = 'file.create';
     const FILE_GET  = 'file.retrieve';
     const FILE_DELETE = 'file.delete';
+    const FILE_LIST = 'file.index';
 
     const TERM_CREATE = 'taxonomy_term.create';
     const TERM_GET  = 'taxonomy_term.retrieve';

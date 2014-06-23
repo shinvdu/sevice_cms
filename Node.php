@@ -30,8 +30,8 @@ class Node extends Service
       $nid = (array)$nid;
     } 
     $return = array();
-    foreach ($$nid as $id) {
-      $return[] = $this->requestSend($this->_methods->NODE_DELETE, array($nid));
+    foreach ($nid as $id) {
+      $return[] = $this->requestSend($this->_methods->NODE_DELETE, array($id));
     }
     return $return;
   }
