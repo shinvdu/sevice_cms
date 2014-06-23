@@ -1,7 +1,6 @@
 <?php
 
-class User extends Service
-{
+class User extends Service {
   // data stored in this object
   protected $user;
 
@@ -18,7 +17,18 @@ class User extends Service
     }
     return $this->requestSend($this->_methods->USER_SAVE, array($uid, $user));
   }
-  public function user_list(){
-      return $this->requestSend($this->_methods->USER_LIST);
+  public function user_create($user) {
+    if(is_array($user)){
+      $user = (object)$user;
+    }
+    return $this->requestSend($this->_methods->USER_CREATE, array($user));
+  }
+
+  public function user_delete($uid) {
+    return $this->requestSend($this->_methods->NODE_DELETE, array($uid));
+  }
+
+  public function user_list($page = 0, $fields = '*', $parameters = array(), $pagesize = 20){
+    return $this->requestSend($this->_methods->USER_LIST, array($page, $fields, $parameters, $pagesize));
   }
 }
