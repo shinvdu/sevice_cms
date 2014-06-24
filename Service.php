@@ -90,6 +90,7 @@ class Service{
         return $this->_connected;
     }
 
-    public function logout(){
+    public function logout() {
+        return $this->requestSend($this->_methods->LOGOUT);
     }
 }
