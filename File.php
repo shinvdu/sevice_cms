@@ -13,6 +13,10 @@ class File extends Service {
     return (object)$this->requestSend($this->_methods->FILE_GET, array($fid, $file_contents, $image_styles));
   }
 
+  public function file_create($file) {
+    return (object)$this->requestSend($this->_methods->FILE_CREATE, array($file));
+  }
+
   public function file_delete($fid) {
     if (!is_array($fid)) {
       $fid = (array)$fid;
@@ -30,7 +34,6 @@ class File extends Service {
     $pagesize: Number of records to get per page.
   */
   public function file_list($page = 0, $fields = '*', $parameters = array(), $pagesize = 20){
-
       return $this->requestSend($this->_methods->FILE_LIST, array($page, $fields, $parameters, $pagesize));
   }
 }

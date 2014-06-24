@@ -25,7 +25,7 @@ class User extends Service {
   }
 
   public function user_delete($uid) {
-    return $this->requestSend($this->_methods->NODE_DELETE, array($uid));
+    return $this->requestSend($this->_methods->USER_DELETE, array($uid));
   }
 
   public function user_list($page = 0, $fields = '*', $parameters = array(), $pagesize = 20){
