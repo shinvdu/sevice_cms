@@ -25,6 +25,7 @@ class Methods{
     const COMMENT_GET  = 'comment.retrieve';
     const COMMENT_SAVE = 'comment.update';
     const COMMENT_DELETE = 'comment.delete';
+    const COMMENT_LIST = 'comment.index';
 
     const FILE_CREATE = 'file.create';
     const FILE_GET  = 'file.retrieve';
@@ -41,6 +42,7 @@ class Methods{
     const VOCABULARY_GET  = 'taxonomy_vocabulary.retrieve';
     const VOCABULARY_SAVE = 'taxonomy_vocabulary.update';
     const VOCABULARY_DELETE = 'taxonomy_vocabulary.delete';
+    const VOCABULARY_LIST = 'taxonomy_vocabulary.index';
 
 
     const SEARCH_NODES = 'search.nodes';
