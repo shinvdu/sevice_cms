@@ -1,6 +1,6 @@
 <?php
 
-class Node extends Service
+class Node extends Connector
 {
   // data stored in this object
   protected $node;

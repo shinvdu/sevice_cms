@@ -1,6 +1,6 @@
 <?php
 
-class Service{
+class Connector {
     protected $_methods_class = 'Methods';
     protected $_methods;
     protected $_token; 

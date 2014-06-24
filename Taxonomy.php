@@ -1,6 +1,6 @@
 <?php
 
-class Taxonomy extends Service {
+class Taxonomy extends Connector {
   
   public function __construct($options){
     parent::__construct($options);

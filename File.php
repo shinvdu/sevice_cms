@@ -1,6 +1,6 @@
 <?php
 
-class File extends Service {
+class File extends Connector {
   
   public function __construct($options){
     parent::__construct($options);

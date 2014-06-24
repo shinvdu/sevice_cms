@@ -1,6 +1,6 @@
 <?php
 
-class System extends Service {
+class System extends Connector {
   public function __construct($options){
     parent::__construct($options);
     $this->connect();

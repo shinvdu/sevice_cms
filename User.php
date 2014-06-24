@@ -1,6 +1,6 @@
 <?php
 
-class User extends Service {
+class User extends Connector {
   // data stored in this object
   protected $user;
 
