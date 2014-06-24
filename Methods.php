@@ -35,6 +35,7 @@ class Methods{
     const TERM_GET  = 'taxonomy_term.retrieve';
     const TERM_SAVE = 'taxonomy_term.update';
     const TERM_DELETE = 'taxonomy_term.delete';
+    const TERM_LIST = 'taxonomy_term.index';
 
     const VOCABULARY_CREATE = 'taxonomy_vocabulary.create';
     const VOCABULARY_GET  = 'taxonomy_vocabulary.retrieve';
